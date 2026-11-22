@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en-GB" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UK Clinical Dietetics Intelligence</title>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('dietetics_theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved !== 'light') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+      try {
+        if (window.self !== window.top) document.documentElement.classList.add('is-embedded');
+      } catch (e) {
+        document.documentElement.classList.add('is-embedded');
+      }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              950: '#060E1F',
+              900: '#0A192F',
+              800: '#112240',
+              700: '#1B365D',
+              600: '#27497A'
+            },
+            teal: {
+              400: '#2DD4BF',
+              500: '#14B8A6',
+              600: '#0D9488',
+              700: '#0F766E'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #ffffff !important; color: #0f172a !important; }
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(13, 148, 136, 0.35); border-radius: 9999px; }
+    /* ---------- Embedded (e.g. Notion /embed) ---------- */
+    html.is-embedded body > header { position: relative; }
+    html.is-embedded body { min-height: 0; }
+
+    /* ---------- Modern dropdowns ---------- */
+    .mselect { position: relative; display: block; width: 100%; }
+    @media (min-width: 640px) { .mselect { display: inline-block; width: auto; min-width: 13.5rem; } }
+    .mselect-native { position: absolute !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; clip: rect(0 0 0 0); }
+    .mselect-btn {
+      display: flex; align-items: center; gap: .55rem; width: 100%;
+      padding: .55rem .7rem .55rem .75rem; border-radius: .85rem;
+      border: 1px solid #DDE3EA; background: #FFFFFF; color: #0A192F;
+      font-size: .78rem; font-weight: 600; line-height: 1.1; text-align: left; cursor: pointer;
+      box-shadow: 0 1px 2px rgba(10, 25, 47, .06), inset 0 -1px 0 rgba(10, 25, 47, .03);
+      transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+    .mselect-btn:hover { border-color: #5EC8BC; }
+    .mselect-btn:focus-visible { outline: none; border-color: #14B8A6; box-shadow: 0 0 0 4px rgba(20, 184, 166, .22); }
+    .mselect.open .mselect-btn { border-color: #14B8A6; box-shadow: 0 0 0 4px rgba(20, 184, 166, .16); }
+    .mselect-icon { flex: none; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: .55rem; background: #E6F7F5; color: #0F766E; }
+    .mselect-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+    .mselect-caption { font-size: .62rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #64748B; }
+    .mselect-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mselect-chev { flex: none; color: #64748B; transition: transform .2s ease; }
+    .mselect.open .mselect-chev { transform: rotate(180deg); color: #0D9488; }
+    .mselect-panel {
+      position: absolute; z-index: 45; top: calc(100% + 6px); left: 0; min-width: 100%; max-height: 18rem; overflow-y: auto;
+      padding: .3rem; border-radius: .95rem; background: #FFFFFF; border: 1px solid #E2E8F0;
+      box-shadow: 0 18px 40px -12px rgba(10, 25, 47, .28), 0 4px 10px -4px rgba(10, 25, 47, .12);
+      opacity: 0; visibility: hidden; transform: translateY(-4px) scale(.98); transform-origin: top left; pointer-events: none;
+      transition: opacity .14s ease, transform .14s ease, visibility 0s linear .14s;
+    }
+    .mselect-panel:focus { outline: none; }
+    .mselect.align-right .mselect-panel { left: auto; right: 0; transform-origin: top right; }
+    .mselect.drop-up .mselect-panel { top: auto; bottom: calc(100% + 6px); transform-origin: bottom left; }
+    .mselect.open .mselect-panel { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: opacity .14s ease, transform .14s ease, visibility 0s; }
+    .mselect-opt { display: flex; align-items: center; gap: .55rem; padding: .55rem .65rem; border-radius: .65rem; font-size: .78rem; color: #334155; cursor: pointer; white-space: nowrap; user-select: none; }
+    .mselect-opt .mselect-check { flex: none; width: 1rem; height: 1rem; color: #0D9488; opacity: 0; }
+    .mselect-opt.is-active { background: #EEF9F7; color: #0A192F; }
+    .mselect-opt[aria-selected="true"] { font-weight: 650; color: #0A192F; }
+    .mselect-opt[aria-selected="true"] .mselect-check { opacity: 1; }
+    .dark .mselect-btn { background: #112240; border-color: #1B365D; color: #F1F5F9; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); }
+    .dark .mselect-btn:hover { border-color: #2DD4BF; }
+    .dark .mselect-icon { background: rgba(45, 212, 191, .12); color: #5EEAD4; }
+    .dark .mselect-caption, .dark .mselect-chev { color: #94A3B8; }
+    .dark .mselect.open .mselect-chev { color: #2DD4BF; }
+    .dark .mselect-panel { background: #0D1D38; border-color: #1B365D; box-shadow: 0 18px 40px -12px rgba(0, 0, 0, .6); }
+    .dark .mselect-opt { color: #CBD5E1; }
+    .dark .mselect-opt.is-active { background: rgba(45, 212, 191, .12); color: #FFFFFF; }
+    .dark .mselect-opt[aria-selected="true"] { color: #FFFFFF; }
+    .dark .mselect-opt .mselect-check { color: #2DD4BF; }
+    @media (prefers-reduced-motion: reduce) { .mselect-panel, .mselect-chev, .mselect-btn { transition: none !important; } }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-navy-950 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200 antialiased">
+
+  <!-- Top Navigation & Telemetry Header -->
+  <header class="sticky top-0 z-40 bg-navy-900/95 dark:bg-navy-950/95 backdrop-blur border-b border-navy-700/80 text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Brand Identity -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-navy-700 flex items-center justify-center shadow-inner border border-teal-400/40">
+            <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">UK Clinical Dietetics Intelligence</h1>
+              <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-400/30">
+                HCPC / BDA / NICE / ONS
+              </span>
+            </div>
+            <p class="text-xs text-slate-300">Live Public Health Surveillance, Evidence Synthesis &amp; Point-of-Care Screening</p>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="syncLiveBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-navy-800 hover:bg-navy-700 text-teal-300 border border-navy-600 transition">
+            <i data-lucide="refresh-cw" id="syncIcon" class="w-3.5 h-3.5"></i>
+            <span>Sync Live Feeds</span>
+          </button>
+
+          <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs bg-navy-800 border border-navy-600 text-slate-200 cursor-pointer select-none">
+            <input id="autoRefreshToggle" type="checkbox" class="rounded border-slate-500 text-teal-500 focus:ring-teal-500" />
+            <span>Auto (5m)</span>
+          </label>
+
+          <button id="exportPdfBtn" type="button" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-600 hover:bg-teal-500 text-white shadow-sm transition">
+            <i data-lucide="file-down" class="w-3.5 h-3.5"></i>
+            <span>Export Briefing PDF</span>
+          </button>
+
+          <button id="themeToggleBtn" type="button" aria-label="Toggle Light/Dark Mode" class="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 border border-navy-600 transition">
+            <i data-lucide="sun" id="sunIcon" class="w-4 h-4 hidden"></i>
+            <i data-lucide="moon" id="moonIcon" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Telemetry Status Bar -->
+      <div class="mt-2.5 pt-2 border-t border-navy-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-300">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="inline-flex items-center gap-1.5">
+            <span id="livePulseDot" class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+            <span id="syncStatusText">Ready — Syncing live open-access clinical feeds...</span>
+          </span>
+          <span class="hidden md:inline text-slate-500">|</span>
+          <span id="sourceTelemetryBadges" class="flex flex-wrap items-center gap-2 text-[11px]">
+            <span class="px-2 py-0.5 rounded bg-navy-800 border border-navy-700 text-teal-300">Europe PMC: Pending</span>
+            <span class="px-2 py-0.5 rounded bg-navy-800 border border-navy-700 text-teal-300">GOV.UK / DHSC: Pending</span>
+            <span class="px-2 py-0.5 rounded bg-navy-800 border border-navy-700 text-teal-300">ONS / CPI: Pending</span>
+            <span class="px-2 py-0.5 rounded bg-navy-800 border border-navy-700 text-teal-300">Google Books: Pending</span>
+          </span>
+        </div>
+        <div class="text-slate-400" id="lastSyncTimestamp">Last updated: Initialising...</div>
+      </div>
+    </div>
+
+    <!-- Primary Navigation Tabs -->
+    <nav class="bg-navy-800/90 dark:bg-navy-900/90 border-t border-navy-700/70">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1 overflow-x-auto custom-scrollbar py-1.5 text-xs font-medium">
+        <button type="button" data-tab="all" class="nav-tab active px-3.5 py-1.5 rounded-lg bg-teal-600 text-white whitespace-nowrap transition">
+          Overview &amp; Surveillance
+        </button>
+        <button type="button" data-tab="nhs" class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-300 hover:bg-navy-700 whitespace-nowrap transition">
+          NHS &amp; NICE Guidance
+        </button>
+        <button type="button" data-tab="ons" class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-300 hover:bg-navy-700 whitespace-nowrap transition">
+          ONS &amp; NDNS Data
+        </button>
+        <button type="button" data-tab="research" class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-300 hover:bg-navy-700 whitespace-nowrap transition">
+          Clinical Research &amp; Journals
+        </button>
+        <button type="button" data-tab="books" class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-300 hover:bg-navy-700 whitespace-nowrap transition">
+          Books &amp; Google Books
+        </button>
+        <button type="button" data-tab="saved" class="nav-tab px-3.5 py-1.5 rounded-lg text-slate-300 hover:bg-navy-700 whitespace-nowrap transition inline-flex items-center gap-1.5">
+          <span>Saved CPD Portfolio</span>
+          <span id="savedCountBadge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-navy-950 text-teal-300 font-bold">0</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- NDNS Cohort Selector & Public Health KPI Strip -->
+    <section aria-label="UK Public Health Surveillance KPIs" class="space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm font-bold uppercase tracking-wider text-navy-800 dark:text-teal-400">UK Population Nutrition &amp; Economic Surveillance</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">NDNS 2019 to 2023 (published June 2025) and ONS consumer price inflation, October 2026</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="ndnsCohortSelect" class="sr-only">NDNS cohort</label>
+          <select id="ndnsCohortSelect" data-caption="NDNS cohort" data-icon="users" class="rounded-lg border border-slate-300 dark:border-navy-700 bg-white dark:bg-navy-800 text-xs font-medium px-3 py-1.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <option value="adults">Adults (19–64 yrs)</option>
+            <option value="adolescents">Adolescents (11–18 yrs)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="dataError" class="hidden rounded-xl border border-rose-400/40 bg-rose-500/10 text-rose-600 dark:text-rose-300 px-4 py-3 text-xs" role="status"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1 -->
+        <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">5-A-Day Compliance</span>
+            <span class="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400">
+              <i data-lucide="apple" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiFiveADay" class="text-2xl font-extrabold text-navy-900 dark:text-white">17%</span>
+            <span id="kpiFiveADayNote" class="text-xs font-medium text-teal-600 dark:text-teal-400">meet 5 A Day</span>
+          </div>
+          <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Target: &ge;400g (5 &times; 80g portions/day)</p>
+        </div>
+
+        <!-- KPI 2 -->
+        <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Below 30g SACN Fibre</span>
+            <span class="p-1.5 rounded-lg bg-navy-50 dark:bg-navy-800 text-navy-700 dark:text-teal-400">
+              <i data-lucide="wheat" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiFibre" class="text-2xl font-extrabold text-navy-900 dark:text-white">96%</span>
+            <span id="kpiFibreNote" class="text-xs font-medium text-amber-600 dark:text-amber-400">Mean 16.4g/day</span>
+          </div>
+          <p id="kpiFibreTarget" class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">SACN recommendation: 30 g AOAC fibre/day</p>
+        </div>
+
+        <!-- KPI 3 -->
+        <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Free Sugars (% Energy)</span>
+            <span class="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400">
+              <i data-lucide="flame" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiSugars" class="text-2xl font-extrabold text-navy-900 dark:text-white">10.0%</span>
+            <span id="kpiSugarsNote" class="text-xs font-medium text-rose-600 dark:text-rose-400">2.0&times; SACN ceiling</span>
+          </div>
+          <p class="mt-1 text-[11px] text-slate-500 dark:text-slate-400">SACN Maximum Ceiling: &le;5% total dietary energy</p>
+        </div>
+
+        <!-- KPI 4 -->
+        <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">ONS Food Inflation</span>
+            <span class="p-1.5 rounded-lg bg-navy-50 dark:bg-navy-800 text-navy-700 dark:text-teal-400">
+              <i data-lucide="trending-up" class="w-4 h-4"></i>
+            </span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span id="kpiFoodCpi" class="text-2xl font-extrabold text-navy-900 dark:text-white">—</span>
+            <span id="kpiFoodCpiNote" class="text-xs font-medium text-teal-600 dark:text-teal-400"></span>
+          </div>
+          <p id="kpiFoodCpiFoot" class="mt-1 text-[11px] text-slate-500 dark:text-slate-400"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Surveillance Charts Row -->
+    <section id="chartsSection" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Chart 1: NDNS DRV Adherence -->
+      <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-5 shadow-sm flex flex-col">
+        <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-sm font-bold text-navy-900 dark:text-white">NDNS: How Diets Measure Against UK Recommendations</h3>
+            <p id="ndnsChartSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Cohort: Adults (19–64 yrs) — % meeting UK recommendation · NDNS 2019–23</p>
+          </div>
+          <div class="inline-flex rounded-lg bg-slate-100 dark:bg-navy-800 p-0.5 text-xs">
+            <button type="button" data-ndns-mode="compliance" class="ndns-mode-btn px-2.5 py-1 rounded-md bg-teal-600 text-white font-semibold transition">Compliance %</button>
+            <button type="button" data-ndns-mode="deficit" class="ndns-mode-btn px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 font-medium transition">Deficit / Excess %</button>
+          </div>
+        </div>
+        <div class="relative h-64 w-full">
+          <canvas id="ndnsChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: ONS Food Affordability & CPI Trajectory -->
+      <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-5 shadow-sm flex flex-col">
+        <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
+          <div>
+            <h3 class="text-sm font-bold text-navy-900 dark:text-white">ONS Food Affordability &amp; Inflation Trajectory</h3>
+            <p id="onsChartSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Healthier vs less healthy food, £ per 1,000 kcal (Food Foundation, 2024)</p>
+          </div>
+          <div class="inline-flex rounded-lg bg-slate-100 dark:bg-navy-800 p-0.5 text-xs">
+            <button type="button" data-ons-mode="cost" class="ons-mode-btn px-2.5 py-1 rounded-md bg-teal-600 text-white font-semibold transition">£ / 1,000 kcal</button>
+            <button type="button" data-ons-mode="cpi" class="ons-mode-btn px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 font-medium transition">Food CPI %</button>
+          </div>
+        </div>
+        <div class="relative h-64 w-full">
+          <canvas id="onsChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main 2-Column Workspace: Feed + Point-of-Care Tools -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- Left 8 Columns: Clinical Intelligence Feed & Google Books -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- Clinical Feed Section -->
+        <section id="feedSection" class="space-y-4">
+          <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-4 shadow-sm space-y-3">
+            <div class="flex flex-col sm:flex-row gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input id="searchInput" type="search" placeholder="Search NICE guidelines, ONS datasets, Europe PMC trials, GLP-1, refeeding..." class="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
+              </div>
+              <select id="evidenceFilter" data-caption="Evidence grade" data-icon="layers" aria-label="Evidence grade" class="rounded-lg border border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-800 text-xs font-medium px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <option value="all">All Evidence Grades</option>
+                <option value="Statutory / NICE Guidance">Statutory / NICE Guidance</option>
+                <option value="National Surveillance (ONS/NDNS)">National Surveillance (ONS/NDNS)</option>
+                <option value="Peer-Reviewed RCT / SR">Peer-Reviewed RCT / SR</option>
+                <option value="Cohort / Clinical Study">Cohort / Clinical Study</option>
+                <option value="Peer-Reviewed Review / Series">Peer-Reviewed Review / Series</option>
+              </select>
+              <button id="resetFiltersBtn" type="button" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-navy-700 hover:bg-slate-100 dark:hover:bg-navy-800 text-xs font-semibold text-slate-600 dark:text-slate-300 transition">
+                Reset
+              </button>
+            </div>
+
+            <!-- Specialty Topic Filter Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 text-xs">
+              <button type="button" data-topic="all" class="topic-pill active px-3 py-1 rounded-full bg-navy-800 text-white dark:bg-teal-600 font-medium whitespace-nowrap">All Specialties</button>
+              <button type="button" data-topic="Obesity &amp; GLP-1" class="topic-pill px-3 py-1 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 whitespace-nowrap">Obesity &amp; GLP-1</button>
+              <button type="button" data-topic="Malnutrition &amp; Frailty" class="topic-pill px-3 py-1 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 whitespace-nowrap">Malnutrition &amp; Frailty</button>
+              <button type="button" data-topic="Paediatric &amp; ARFID" class="topic-pill px-3 py-1 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 whitespace-nowrap">Paediatric &amp; ARFID</button>
+              <button type="button" data-topic="Public Health &amp; NPM" class="topic-pill px-3 py-1 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 whitespace-nowrap">Public Health &amp; NPM</button>
+              <button type="button" data-topic="Gastroenterology &amp; Microbiome" class="topic-pill px-3 py-1 rounded-full bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 whitespace-nowrap">Gastroenterology &amp; Microbiome</button>
+            </div>
+          </div>
+
+          <!-- Feed Results Header -->
+          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+            <span id="feedResultsCount">Showing clinical intelligence items</span>
+            <span id="feedLiveIndicator" class="text-teal-600 dark:text-teal-400 font-medium">Europe PMC &amp; GOV.UK Live Enabled</span>
+          </div>
+
+          <!-- Dynamic Feed Cards List -->
+          <div id="feedList" class="space-y-3"></div>
+        </section>
+
+        <!-- Google Books Reference Literature Section -->
+        <section id="booksSection" class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-teal-600 dark:text-teal-400"></i>
+                <h3 class="text-base font-bold text-navy-900 dark:text-white">Clinical Dietetics Texts &amp; Google Books Search</h3>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Search live Google Books index for 2025–2026 textbooks, BDA manuals, and clinical nutrition monographs</p>
+            </div>
+            <button id="exportBooksPdfBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-navy-800 hover:bg-navy-700 text-teal-300 border border-navy-600 transition">
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+              <span>Export Reading List PDF</span>
+            </button>
+          </div>
+
+          <!-- Google Books Search Form -->
+          <form id="bookSearchForm" class="flex flex-col sm:flex-row gap-2">
+            <div class="relative flex-1">
+              <i data-lucide="library" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input id="bookSearchInput" type="search" value="Clinical Dietetics Nutrition Practice" placeholder="Search Google Books (e.g., Parenteral Nutrition, Paediatric Dietetics, Gut Microbiome)..." class="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-800 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold transition">
+              Search Google Books
+            </button>
+          </form>
+
+          <!-- Preset Topic Chips -->
+          <div class="flex flex-wrap gap-1.5 text-xs">
+            <button type="button" data-book-query="Manual of Dietetic Practice" class="book-chip px-2.5 py-1 rounded-md bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-500/30 hover:bg-teal-100 transition">BDA Dietetic Practice</button>
+            <button type="button" data-book-query="Clinical Paediatric Dietetics" class="book-chip px-2.5 py-1 rounded-md bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 transition">Paediatric &amp; ARFID</button>
+            <button type="button" data-book-query="Malnutrition Sarcopenia Frailty Nutrition" class="book-chip px-2.5 py-1 rounded-md bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 transition">Malnutrition &amp; Frailty</button>
+            <button type="button" data-book-query="Obesity GLP-1 Medical Nutrition Therapy" class="book-chip px-2.5 py-1 rounded-md bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 transition">Obesity &amp; GLP-1</button>
+            <button type="button" data-book-query="Gastroenterology Microbiome FODMAP Dietetics" class="book-chip px-2.5 py-1 rounded-md bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700 transition">Gastro &amp; Microbiome</button>
+          </div>
+
+          <div id="booksStatusText" class="text-[11px] text-slate-500 dark:text-slate-400">Showing curated UK reference texts &amp; Google Books results</div>
+          <div id="booksGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </section>
+      </div>
+
+      <!-- Right 4 Columns: Point-of-Care Clinical Tools & Saved CPD -->
+      <aside id="toolsSidebar" class="lg:col-span-4 space-y-6">
+
+        <!-- Tool 1: BAPEN 'MUST' Malnutrition Screening Calculator -->
+        <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-5 shadow-sm space-y-3.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 rounded-lg bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                <i data-lucide="calculator" class="w-4 h-4"></i>
+              </span>
+              <h3 class="text-sm font-bold text-navy-900 dark:text-white">BAPEN 'MUST' Risk Estimator</h3>
+            </div>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-navy-100 dark:bg-navy-800 text-navy-800 dark:text-teal-300">NICE CG32</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 text-xs">
+            <div>
+              <label for="mustWeight" class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Current Weight (kg)</label>
+              <input id="mustWeight" type="number" step="0.1" min="20" max="300" value="54.0" class="w-full rounded-lg border border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-800 px-2.5 py-1.5 text-slate-900 dark:text-white" />
+            </div>
+            <div>
+              <label for="mustHeight" class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Height (cm)</label>
+              <input id="mustHeight" type="number" step="0.5" min="100" max="230" value="168" class="w-full rounded-lg border border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-800 px-2.5 py-1.5 text-slate-900 dark:text-white" />
+            </div>
+            <div class="col-span-2">
+              <label for="mustPrevWeight" class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Usual Weight 3–6 Months Ago (kg)</label>
+              <input id="mustPrevWeight" type="number" step="0.1" min="20" max="300" value="59.5" class="w-full rounded-lg border border-slate-300 dark:border-navy-700 bg-slate-50 dark:bg-navy-800 px-2.5 py-1.5 text-slate-900 dark:text-white" />
+            </div>
+            <div class="col-span-2 flex items-center gap-2 pt-1">
+              <input id="mustAcuteEffect" type="checkbox" class="rounded border-slate-400 text-teal-600 focus:ring-teal-500" />
+              <label for="mustAcuteEffect" class="text-slate-700 dark:text-slate-300">Acutely ill &amp; no nutritional intake &gt;5 days (+2)</label>
+            </div>
+          </div>
+
+          <div id="mustResultBox" class="rounded-lg p-3 bg-teal-50/80 dark:bg-navy-800 border border-teal-200 dark:border-teal-500/30 text-xs space-y-1">
+            <div class="flex items-center justify-between font-bold text-navy-900 dark:text-white">
+              <span id="mustScoreLabel">Total 'MUST' Score: 2 (High Risk)</span>
+              <span id="mustBmiBadge" class="px-2 py-0.5 rounded bg-teal-600 text-white text-[11px]">BMI 19.1</span>
+            </div>
+            <p id="mustActionText" class="text-slate-700 dark:text-slate-300 leading-relaxed">
+              Unplanned weight loss: 9.2%. Refer to Dietitian / Nutrition Support Team; set nutrition care plan and monitor weekly.
+            </p>
+          </div>
+        </div>
+
+        <!-- Tool 2: NICE CG32 / BAPEN Refeeding Syndrome Risk Checker -->
+        <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-5 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 rounded-lg bg-navy-100 dark:bg-navy-800 text-navy-700 dark:text-teal-400">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+              </span>
+              <h3 class="text-sm font-bold text-navy-900 dark:text-white">Refeeding Syndrome Risk Checker</h3>
+            </div>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-teal-100 dark:bg-teal-500/20 text-teal-800 dark:text-teal-300">BAPEN</span>
+          </div>
+
+          <div class="space-y-2 text-xs text-slate-700 dark:text-slate-300">
+            <p class="font-semibold text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Major Criteria (1+ = High Risk)</p>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" class="refeed-major mt-0.5 rounded text-teal-600" />
+              <span>BMI &lt; 16 kg/m&sup2;</span>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" class="refeed-major mt-0.5 rounded text-teal-600" />
+              <span>Unintentional weight loss &gt; 15% in last 3–6 months</span>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" class="refeed-major mt-0.5 rounded text-teal-600" />
+              <span>Little or no nutritional intake for &gt; 10 days</span>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" class="refeed-major mt-0.5 rounded text-teal-600" />
+              <span>Low K&plus;, PO&#8324;&sup3;&minus;, or Mg&sup2;&plus; prior to feeding</span>
+            </label>
+
+            <p class="font-semibold text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 pt-1">Minor Criteria (2+ = High Risk)</p>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" class="refeed-minor mt-0.5 rounded text-teal-600" />
+              <span>BMI &lt; 18.5 kg/m&sup2;</span>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" class="refeed-minor mt-0.5 rounded text-teal-600" />
+              <span>Unintentional weight loss &gt; 10% in last 3–6 months</span>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input id="refeedMinorIntake" type="checkbox" class="refeed-minor mt-0.5 rounded text-teal-600" />
+              <span>Little or no nutritional intake for &gt; 5 days</span>
+            </label>
+            <label class="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" class="refeed-minor mt-0.5 rounded text-teal-600" />
+              <span>History of alcohol misuse, or drugs including insulin, chemotherapy, antacids or diuretics</span>
+            </label>
+          </div>
+
+          <div id="refeedResultBox" class="rounded-lg p-3 bg-slate-100 dark:bg-navy-800 border border-slate-200 dark:border-navy-700 text-xs space-y-1">
+            <div id="refeedRiskTitle" class="font-bold text-navy-900 dark:text-white">Standard Refeeding Risk</div>
+            <p id="refeedRiskGuidance" class="text-slate-600 dark:text-slate-300 leading-relaxed">
+              No NICE CG32 high-risk criteria selected. Commence standard nutritional support and monitor U&amp;Es per local trust protocol.
+            </p>
+          </div>
+        </div>
+
+        <!-- Saved CPD Briefings & Reading List Widget -->
+        <div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-5 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i data-lucide="bookmark" class="w-4 h-4 text-teal-600 dark:text-teal-400"></i>
+              <h3 class="text-sm font-bold text-navy-900 dark:text-white">Saved HCPC CPD Portfolio</h3>
+            </div>
+            <button id="clearSavedBtn" type="button" class="text-[11px] text-slate-400 hover:text-rose-500 transition">Clear</button>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Bookmarked guidance, trials, and Google Books volumes are automatically included in your exported PDF briefing.</p>
+          <div id="savedSidebarList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar text-xs"></div>
+          <button id="sidebarExportPdfBtn" type="button" class="w-full py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-teal-300 font-semibold text-xs border border-navy-600 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="file-down" class="w-3.5 h-3.5"></i>
+            <span>Generate CPD &amp; Surveillance PDF</span>
+          </button>
+        </div>
+
+      </aside>
+    </div>
+  </main>
+
+  <!-- Clinical Detail Modal -->
+  <div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-navy-950/75 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-navy-900 text-white flex items-start justify-between gap-3">
+        <div>
+          <span id="modalMetaBadge" class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-400/30 mb-1">NICE / Clinical Evidence</span>
+          <h3 id="modalTitle" class="text-base font-bold leading-snug">Clinical Evidence Title</h3>
+        </div>
+        <button id="closeModalBtn" type="button" class="p-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto custom-scrollbar space-y-4 text-xs sm:text-sm text-slate-700 dark:text-slate-200">
+        <div class="flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400" id="modalSubMeta"></div>
+        <div class="space-y-1.5">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-navy-800 dark:text-teal-400">Executive Summary &amp; Abstract</h4>
+          <p id="modalSummary" class="leading-relaxed"></p>
+        </div>
+        <div class="rounded-xl bg-teal-50/70 dark:bg-navy-800 border border-teal-200 dark:border-teal-500/30 p-3.5 space-y-1">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300">Dietetic Practice Implications</h4>
+          <p id="modalImplications" class="text-xs leading-relaxed text-slate-800 dark:text-slate-200"></p>
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 dark:bg-navy-950 border-t border-slate-200 dark:border-navy-800 flex flex-wrap items-center justify-between gap-2">
+        <button id="modalBookmarkBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-navy-800 text-white hover:bg-navy-700 transition">
+          <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
+          <span>Save to CPD</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="modalExportSinglePdfBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-600 hover:bg-teal-500 text-white transition">
+            <i data-lucide="file-down" class="w-3.5 h-3.5"></i>
+            <span>Export Item PDF</span>
+          </button>
+          <a id="modalExternalLink" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-navy-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-navy-800 transition">
+            <span>Open Source</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Preview Fallback Modal (if sandbox blocks blob download) -->
+  <div id="pdfPreviewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-navy-950/80 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-700 rounded-2xl max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-3 bg-navy-900 text-white flex items-center justify-between">
+        <span class="text-sm font-bold">UK Clinical Dietetics Executive Briefing PDF</span>
+        <div class="flex items-center gap-2">
+          <a id="pdfDirectDownloadLink" href="#" download="UK-Clinical-Dietetics-Briefing.pdf" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-xs font-semibold text-white">Download File</a>
+          <button id="closePdfPreviewBtn" type="button" class="p-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+      <iframe id="pdfPreviewFrame" class="flex-1 w-full bg-slate-200" title="PDF Preview"></iframe>
+    </div>
+  </div>
+
+  <footer class="bg-navy-900 text-slate-400 border-t border-navy-800 py-4 px-4 text-center text-xs no-print">
+    UK Clinical Dietetics Intelligence &amp; Public Health Surveillance Dashboard &bull; Aligned with HCPC Standards, BDA Practice, NICE Guidelines, ONS &amp; Europe PMC
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---------------- Safe Storage Wrapper ---------------- */
+      const memStore = {};
+      const safeStorage = {
+        get(key, fallback) {
+          try {
+            const val = localStorage.getItem(key);
+            return val !== null ? val : (key in memStore ? memStore[key] : fallback);
+          } catch (e) {
+            return key in memStore ? memStore[key] : fallback;
+          }
+        },
+        set(key, val) {
+          memStore[key] = val;
+          try { localStorage.setItem(key, val); } catch (e) {}
+        }
+      };
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+
+      /* ---------------- Embed Detection ---------------- */
+      const IS_EMBEDDED = document.documentElement.classList.contains('is-embedded');
+
+      /* ---------------- Modern Dropdown Component ---------------- */
+      const MSELECT_ICONS = {
+        users: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        layers: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>'
+      };
+      const MSELECT_CHEVRON = '<svg class="mselect-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+      const MSELECT_CHECK = '<svg class="mselect-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+      const enhancedSelects = [];
+
+      function enhanceSelect(native) {
+        const uid = native.id;
+        const caption = native.dataset.caption || '';
+        const wrap = document.createElement('div');
+        wrap.className = 'mselect';
+        native.parentNode.insertBefore(wrap, native);
+        wrap.appendChild(native);
+        native.classList.add('mselect-native');
+        native.tabIndex = -1;
+        native.setAttribute('aria-hidden', 'true');
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = uid + '-button';
+        btn.className = 'mselect-btn';
+        btn.setAttribute('aria-haspopup', 'listbox');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-controls', uid + '-listbox');
+        btn.innerHTML =
+          (MSELECT_ICONS[native.dataset.icon] ? '<span class="mselect-icon">' + MSELECT_ICONS[native.dataset.icon] + '</span>' : '') +
+          '<span class="mselect-text">' +
+            (caption ? '<span class="mselect-caption">' + escapeHtml(caption) + '</span>' : '') +
+            '<span class="mselect-value"></span>' +
+          '</span>' + MSELECT_CHEVRON;
+
+        const panel = document.createElement('div');
+        panel.className = 'mselect-panel custom-scrollbar';
+        panel.id = uid + '-listbox';
+        panel.setAttribute('role', 'listbox');
+        panel.setAttribute('aria-label', caption || native.getAttribute('aria-label') || 'Options');
+        panel.tabIndex = -1;
+
+        const opts = Array.from(native.options).map((o, i) => {
+          const el = document.createElement('div');
+          el.className = 'mselect-opt';
+          el.id = uid + '-opt-' + i;
+          el.setAttribute('role', 'option');
+          el.innerHTML = MSELECT_CHECK + '<span>' + escapeHtml(o.textContent) + '</span>';
+          el.addEventListener('mousemove', () => setActive(i, false));
+          el.addEventListener('click', () => choose(i));
+          panel.appendChild(el);
+          return el;
+        });
+
+        wrap.appendChild(btn);
+        wrap.appendChild(panel);
+        const lbl = document.querySelector('label[for="' + uid + '"]');
+        if (lbl) lbl.htmlFor = btn.id;
+
+        let active = native.selectedIndex;
+        let typed = '';
+        let typedTimer = null;
+
+        function render() {
+          const sel = native.options[native.selectedIndex];
+          const text = sel ? sel.textContent : '';
+          btn.querySelector('.mselect-value').textContent = text;
+          btn.setAttribute('aria-label', (caption ? caption + ': ' : '') + text);
+          opts.forEach((el, i) => el.setAttribute('aria-selected', i === native.selectedIndex ? 'true' : 'false'));
+        }
+        function setActive(i, scroll) {
+          active = Math.max(0, Math.min(opts.length - 1, i));
+          opts.forEach((el, j) => el.classList.toggle('is-active', j === active));
+          panel.setAttribute('aria-activedescendant', opts[active].id);
+          if (scroll !== false) opts[active].scrollIntoView({ block: 'nearest' });
+        }
+        function open() {
+          enhancedSelects.forEach(s => { if (s.wrap !== wrap) s.close(false); });
+          wrap.classList.remove('align-right', 'drop-up');
+          wrap.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+          const r = panel.getBoundingClientRect();
+          const w = wrap.getBoundingClientRect();
+          if (r.right > window.innerWidth - 8) wrap.classList.add('align-right');
+          if (r.bottom > window.innerHeight - 8 && w.top > r.height + 16) wrap.classList.add('drop-up');
+          setActive(native.selectedIndex);
+          panel.focus({ preventScroll: true });
+        }
+        function close(focusBtn) {
+          if (!wrap.classList.contains('open')) return;
+          wrap.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          if (focusBtn) btn.focus();
+        }
+        function choose(i) {
+          const changed = native.selectedIndex !== i;
+          native.selectedIndex = i;
+          render();
+          close(true);
+          if (changed) native.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        btn.addEventListener('click', () => (wrap.classList.contains('open') ? close(true) : open()));
+        btn.addEventListener('keydown', e => {
+          if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) { e.preventDefault(); open(); }
+        });
+        panel.addEventListener('keydown', e => {
+          if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+          else if (e.key === 'Home') { e.preventDefault(); setActive(0); }
+          else if (e.key === 'End') { e.preventDefault(); setActive(opts.length - 1); }
+          else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(active); }
+          else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+          else if (e.key === 'Tab') { close(false); }
+          else if (e.key.length === 1) {
+            typed += e.key.toLowerCase();
+            clearTimeout(typedTimer);
+            typedTimer = setTimeout(() => { typed = ''; }, 600);
+            const hit = Array.from(native.options).findIndex(o => o.textContent.toLowerCase().startsWith(typed));
+            if (hit >= 0) setActive(hit);
+          }
+        });
+        document.addEventListener('pointerdown', e => { if (!wrap.contains(e.target)) close(false); });
+        native.addEventListener('change', render);
+
+        render();
+        enhancedSelects.push({ wrap, render, close });
+      }
+
+      function refreshEnhancedSelects() {
+        enhancedSelects.forEach(s => s.render());
+      }
+
+      /* ---------------- Weekly data (data.json, updated by the weekly routine) ---------------- */
+      let NDNS_LABELS = [];
+      let NDNS_COHORTS = {};
+      let BASELINE_FEED = [];
+      let BASELINE_BOOKS = [];
+      let DATA = null;
+
+      /* ---------------- Application State ---------------- */
+      const state = {
+        activeTab: 'all',
+        topicFilter: 'all',
+        evidenceFilter: 'all',
+        searchQuery: '',
+        cohort: 'adults',
+        ndnsChartMode: 'compliance',
+        onsChartMode: 'cost',
+        feedItems: [],
+        books: [],
+        savedIds: JSON.parse(safeStorage.get('dietetics_saved_ids', '[]')),
+        savedBooks: JSON.parse(safeStorage.get('dietetics_saved_books', '[]')),
+        onsLiveData: { months: [], foodCpi: [], costLabels: [], costValues: [] },
+        activeModalItem: null,
+        autoRefreshTimer: null,
+        ndnsChartInstance: null,
+        onsChartInstance: null
+      };
+
+      /* ---------------- Helper: Fetch with Timeout ---------------- */
+      async function fetchJsonWithTimeout(url, timeoutMs = 4500) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const res = await fetch(url, { signal: controller.signal });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return await res.json();
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
+      /* ---------------- Load the weekly data file ---------------- */
+      async function loadData() {
+        try {
+          const res = await fetch('data.json?v=' + Date.now(), { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          DATA = await res.json();
+          NDNS_LABELS = DATA.ndns.labels;
+          NDNS_COHORTS = DATA.ndns.cohorts;
+          if (!NDNS_COHORTS[state.cohort]) state.cohort = Object.keys(NDNS_COHORTS)[0];
+          BASELINE_FEED = DATA.feed.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
+          BASELINE_BOOKS = DATA.books.slice();
+          state.feedItems = BASELINE_FEED.slice();
+          state.books = BASELINE_BOOKS.slice();
+          state.onsLiveData = DATA.ons;
+          const k = DATA.kpis.foodCpi;
+          document.getElementById('kpiFoodCpi').textContent = k.value;
+          document.getElementById('kpiFoodCpiNote').textContent = k.note;
+          document.getElementById('kpiFoodCpiFoot').textContent = k.footnote;
+          document.getElementById('dataError').classList.add('hidden');
+        } catch (e) {
+          const err = document.getElementById('dataError');
+          err.textContent = 'The weekly data file didn’t load. Refresh the page to try again.';
+          err.classList.remove('hidden');
+        }
+      }
+
+      /* ---------------- Live API Synchronization Engine ---------------- */
+      async function syncAllLiveFeeds(customQuery) {
+        const syncIcon = document.getElementById('syncIcon');
+        const statusText = document.getElementById('syncStatusText');
+        if (syncIcon) syncIcon.classList.add('animate-spin');
+        if (statusText) statusText.textContent = 'Syncing Europe PMC, GOV.UK, World Bank/ONS & Google Books...';
+
+        const badges = {
+          epmc: 'Europe PMC: Cached',
+          gov: 'GOV.UK / DHSC: Cached',
+          ons: ((DATA && DATA.sources && DATA.sources[0]) || 'ONS CPI'),
+          books: 'Google Books: Ready'
+        };
+
+        const qTerm = (customQuery && customQuery.trim().length > 2)
+          ? customQuery.trim()
+          : 'dietetics nutrition malnutrition obesity';
+
+        // 1. Europe PMC Live Clinical Research API
+        const epmcPromise = (async () => {
+          try {
+            const url = 'https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=' +
+              encodeURIComponent('(' + qTerm + ') AND (OPEN_ACCESS:Y) AND (FIRST_PDATE:[2025-01-01 TO 2026-12-31])') +
+              '&resultType=core&pageSize=6&format=json';
+            const data = await fetchJsonWithTimeout(url, 4800);
+            const results = (data && data.resultList && data.resultList.result) || [];
+            if (results.length > 0) {
+              const mapped = results.map((r, idx) => {
+                const title = r.title || 'Peer-Reviewed Clinical Nutrition Study';
+                const isRct = /randomi[sz]ed|meta-analysis|systematic review|trial/i.test(title + ' ' + (r.abstractText || ''));
+                const topic = inferTopic(title);
+                return {
+                  id: 'epmc-' + (r.id || r.pmid || idx),
+                  category: 'research',
+                  source: (r.journalTitle || 'Europe PMC') + (r.pmid ? ' (PMID ' + r.pmid + ')' : ''),
+                  date: r.firstPublicationDate || '2026',
+                  evidenceGrade: isRct ? 'Peer-Reviewed RCT / SR' : 'Cohort / Clinical Study',
+                  topic,
+                  title,
+                  summary: r.abstractText
+                    ? r.abstractText.replace(/<[^>]+>/g, '').slice(0, 520) + (r.abstractText.length > 520 ? '...' : '')
+                    : 'Open-access peer-reviewed clinical nutrition article indexed via Europe PMC.',
+                  implications: 'Evaluate study population applicability against UK BDA & NICE clinical pathways before adopting into local formulary or patient care plans.',
+                  url: r.pmid ? 'https://europepmc.org/article/MED/' + r.pmid : 'https://europepmc.org/'
+                };
+              });
+              mergeFeedItems(mapped);
+              badges.epmc = 'Europe PMC: Live (' + mapped.length + ')';
+            }
+          } catch (e) {
+            badges.epmc = 'Europe PMC: Offline Fallback';
+          }
+        })();
+
+        // 2. GOV.UK / DHSC / OHID Public Health Feed
+        const govPromise = (async () => {
+          try {
+            const url = 'https://www.gov.uk/api/search.json?q=' +
+              encodeURIComponent('nutrition diet obesity food strategy') +
+              '&count=5&order=-public_timestamp';
+            const data = await fetchJsonWithTimeout(url, 4500);
+            const results = (data && data.results) || [];
+            if (results.length > 0) {
+              const mapped = results.map((r, idx) => ({
+                id: 'govuk-' + (r._id || idx),
+                category: 'nhs',
+                source: 'GOV.UK / DHSC',
+                date: (r.public_timestamp || '2026').slice(0, 10),
+                evidenceGrade: 'Statutory / NICE Guidance',
+                topic: inferTopic(r.title || ''),
+                title: r.title || 'UK Government Public Health Nutrition Update',
+                summary: r.description || 'Official UK government nutrition, dietary surveillance, or public health policy publication.',
+                implications: 'Review alignment with local NHS Trust catering, public health commissioning, and primary care prevention messaging.',
+                url: r.link ? (r.link.startsWith('http') ? r.link : 'https://www.gov.uk' + r.link) : 'https://www.gov.uk'
+              }));
+              mergeFeedItems(mapped);
+              badges.gov = 'GOV.UK / DHSC: Live (' + mapped.length + ')';
+            }
+          } catch (e) {
+            badges.gov = 'GOV.UK / DHSC: Cached';
+          }
+        })();
+
+        // 3. World Bank UK Headline CPI Sync (augments ONS surveillance)
+        const onsPromise = (async () => {
+          try {
+            const url = 'https://api.worldbank.org/v2/country/GBR/indicator/FP.CPI.TOTL.ZG?format=json&per_page=6';
+            const data = await fetchJsonWithTimeout(url, 4500);
+            const series = Array.isArray(data) && Array.isArray(data[1]) ? data[1] : [];
+            const valid = series.filter(d => d && d.value !== null).reverse();
+            if (valid.length >= 3) {
+              badges.ons = ((DATA && DATA.sources && DATA.sources[0]) || 'ONS CPI');
+            }
+          } catch (e) {
+            badges.ons = ((DATA && DATA.sources && DATA.sources[0]) || 'ONS CPI');
+          }
+        })();
+
+        // 4. Google Books Initial Sync
+        const booksPromise = searchGoogleBooks(document.getElementById('bookSearchInput').value || 'Clinical Dietetics Nutrition', true).then(ok => {
+          badges.books = ok ? 'Google Books: Live' : 'Google Books: Core List';
+        });
+
+        await Promise.allSettled([epmcPromise, govPromise, onsPromise, booksPromise]);
+
+        if (syncIcon) syncIcon.classList.remove('animate-spin');
+        const nowStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        if (statusText) statusText.textContent = 'Live intelligence feeds synchronised';
+        const tsEl = document.getElementById('lastSyncTimestamp');
+        if (tsEl) tsEl.textContent = 'Last synced: Today at ' + nowStr + ' GMT';
+
+        const badgesEl = document.getElementById('sourceTelemetryBadges');
+        if (badgesEl) {
+          badgesEl.innerHTML = Object.values(badges)
+            .map(b => '<span class="px-2 py-0.5 rounded bg-navy-800 border border-navy-700 text-teal-300">' + escapeHtml(b) + '</span>')
+            .join('');
+        }
+
+        renderFeed();
+        renderSavedSidebar();
+      }
+
+      function inferTopic(text) {
+        const t = text.toLowerCase();
+        if (/glp-1|semaglutide|tirzepatide|obesity|weight|bariatric/.test(t)) return 'Obesity & GLP-1';
+        if (/malnutrition|frailty|sarcopenia|refeeding|must|enteral|parenteral/.test(t)) return 'Malnutrition & Frailty';
+        if (/paediatric|pediatric|child|infant|arfid|adolescent/.test(t)) return 'Paediatric & ARFID';
+        if (/microbiome|fodmap|ibs|ibd|gut|coeliac|gastro/.test(t)) return 'Gastroenterology & Microbiome';
+        return 'Public Health & NPM';
+      }
+
+      function mergeFeedItems(newItems) {
+        const map = new Map();
+        state.feedItems.forEach(item => map.set(item.title.toLowerCase(), item));
+        newItems.forEach(item => {
+          const key = item.title.toLowerCase();
+          if (!map.has(key)) {
+            map.set(key, item);
+          }
+        });
+        state.feedItems = Array.from(map.values());
+      }
+
+      /* ---------------- Google Books Live Search ---------------- */
+      async function searchGoogleBooks(query, silent) {
+        const statusEl = document.getElementById('booksStatusText');
+        if (!silent && statusEl) statusEl.textContent = 'Querying Google Books API for "' + query + '"...';
+        try {
+          const url = 'https://www.googleapis.com/books/v1/volumes?q=' +
+            encodeURIComponent(query + ' nutrition dietetics') +
+            '&maxResults=6&orderBy=relevance&printType=books';
+          const data = await fetchJsonWithTimeout(url, 4800);
+          const items = (data && data.items) || [];
+          if (items.length > 0) {
+            const apiBooks = items.map((vol, idx) => {
+              const info = vol.volumeInfo || {};
+              return {
+                id: 'gbook-' + (vol.id || idx),
+                title: info.title || 'Clinical Nutrition Volume',
+                authors: Array.isArray(info.authors) ? info.authors.join(', ') : 'Academic / Clinical Contributors',
+                year: info.publishedDate ? info.publishedDate.slice(0, 4) : '2025/2026',
+                publisher: info.publisher || 'Academic Press',
+                description: info.description
+                  ? info.description.slice(0, 220) + (info.description.length > 220 ? '...' : '')
+                  : 'Indexed via Google Books clinical nutrition & dietetics search.',
+                link: info.infoLink || ('https://books.google.co.uk/books?q=' + encodeURIComponent(info.title || query))
+              };
+            });
+            state.books = [...BASELINE_BOOKS.slice(0, 2), ...apiBooks];
+            if (statusEl) statusEl.textContent = 'Showing curated UK core texts + ' + apiBooks.length + ' live Google Books results for "' + query + '"';
+            renderBooks();
+            return true;
+          }
+        } catch (e) {}
+        state.books = [...BASELINE_BOOKS];
+        if (statusEl) statusEl.textContent = 'Showing curated 2025–2026 UK clinical dietetics reference texts';
+        renderBooks();
+        return false;
+      }
+
+      /* ---------------- Rendering Functions ---------------- */
+      function renderFeed() {
+        const container = document.getElementById('feedList');
+        const countEl = document.getElementById('feedResultsCount');
+        if (!container) return;
+
+        const q = state.searchQuery.trim().toLowerCase();
+        const filtered = state.feedItems.filter(item => {
+          if (state.activeTab === 'saved') {
+            return state.savedIds.includes(item.id);
+          }
+          if (state.activeTab !== 'all' && state.activeTab !== 'books' && item.category !== state.activeTab) {
+            return false;
+          }
+          if (state.topicFilter !== 'all' && item.topic !== state.topicFilter) {
+            return false;
+          }
+          if (state.evidenceFilter !== 'all' && item.evidenceGrade !== state.evidenceFilter) {
+            return false;
+          }
+          if (q) {
+            const hay = (item.title + ' ' + item.summary + ' ' + item.source + ' ' + item.topic).toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          return true;
+        });
+
+        if (countEl) {
+          countEl.textContent = 'Showing ' + filtered.length + ' clinical intelligence item' + (filtered.length === 1 ? '' : 's');
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML =
+            '<div class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 p-8 text-center space-y-2">' +
+            '<p class="text-sm font-semibold text-navy-900 dark:text-white">No matching clinical updates found</p>' +
+            '<p class="text-xs text-slate-500 dark:text-slate-400">Try clearing active filters or syncing live Europe PMC articles for your search term.</p>' +
+            '</div>';
+          return;
+        }
+
+        container.innerHTML = filtered.map(item => {
+          const isSaved = state.savedIds.includes(item.id);
+          return (
+            '<article class="rounded-xl bg-white dark:bg-navy-900 border border-slate-200 dark:border-navy-800 hover:border-teal-500/60 p-4 shadow-sm transition space-y-2.5">' +
+              '<div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">' +
+                '<div class="flex flex-wrap items-center gap-1.5">' +
+                  '<span class="px-2 py-0.5 rounded font-semibold bg-navy-900 text-teal-300 dark:bg-navy-800">' + escapeHtml(item.source) + '</span>' +
+                  '<span class="px-2 py-0.5 rounded font-medium bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-500/30">' + escapeHtml(item.evidenceGrade) + '</span>' +
+                  '<span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-navy-800 text-slate-600 dark:text-slate-300">' + escapeHtml(item.topic) + '</span>' +
+                '</div>' +
+                '<span class="text-slate-400 font-medium">' + escapeHtml(item.date) + '</span>' +
+              '</div>' +
+              '<h3 class="text-sm sm:text-base font-bold text-navy-900 dark:text-white leading-snug">' +
+                '<button type="button" data-action="open-modal" data-id="' + escapeHtml(item.id) + '" class="text-left hover:text-teal-600 dark:hover:text-teal-400 transition">' +
+                  escapeHtml(item.title) +
+                '</button>' +
+              '</h3>' +
+              '<p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">' + escapeHtml(item.summary) + '</p>' +
+              '<div class="pt-1 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 dark:border-navy-800">' +
+                '<button type="button" data-action="open-modal" data-id="' + escapeHtml(item.id) + '" class="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline">' +
+                  'Clinical Implications &amp; Full Abstract &rarr;' +
+                '</button>' +
+                '<button type="button" data-action="toggle-bookmark" data-id="' + escapeHtml(item.id) + '" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium ' +
+                  (isSaved
+                    ? 'bg-teal-600 text-white'
+                    : 'bg-slate-100 dark:bg-navy-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-navy-700') +
+                  ' transition">' +
+                  '<span>' + (isSaved ? 'Saved in CPD' : 'Save to CPD') + '</span>' +
+                '</button>' +
+              '</div>' +
+            '</article>'
+          );
+        }).join('');
+      }
+
+      function renderBooks() {
+        const grid = document.getElementById('booksGrid');
+        if (!grid) return;
+
+        grid.innerHTML = state.books.map(book => {
+          const isSaved = state.savedBooks.some(b => b.id === book.id);
+          return (
+            '<div class="rounded-xl border border-slate-200 dark:border-navy-800 bg-slate-50/70 dark:bg-navy-800/60 p-3.5 flex flex-col justify-between gap-2.5">' +
+              '<div class="space-y-1">' +
+                '<div class="flex items-start justify-between gap-2">' +
+                  '<h4 class="text-xs sm:text-sm font-bold text-navy-900 dark:text-white leading-snug">' + escapeHtml(book.title) + '</h4>' +
+                  '<span class="shrink-0 px-2 py-0.5 rounded text-[10px] font-semibold bg-navy-900 text-teal-300">' + escapeHtml(book.year) + '</span>' +
+                '</div>' +
+                '<p class="text-[11px] font-medium text-teal-700 dark:text-teal-400">' + escapeHtml(book.authors) + ' &bull; ' + escapeHtml(book.publisher) + '</p>' +
+                '<p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-3">' + escapeHtml(book.description) + '</p>' +
+              '</div>' +
+              '<div class="pt-2 border-t border-slate-200/70 dark:border-navy-700 flex items-center justify-between gap-2 text-xs">' +
+                '<a href="' + escapeHtml(book.link) + '" target="_blank" rel="noopener noreferrer" class="font-semibold text-navy-700 dark:text-teal-300 hover:underline">Preview on Google Books &nearr;</a>' +
+                '<button type="button" data-action="toggle-book" data-id="' + escapeHtml(book.id) + '" class="px-2.5 py-1 rounded-md font-medium ' +
+                  (isSaved
+                    ? 'bg-teal-600 text-white'
+                    : 'bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 text-slate-700 dark:text-slate-200 hover:border-teal-500') +
+                  ' transition">' +
+                  (isSaved ? 'Saved' : '+ Reading List') +
+                '</button>' +
+              '</div>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function renderSavedSidebar() {
+        const listEl = document.getElementById('savedSidebarList');
+        const badgeEl = document.getElementById('savedCountBadge');
+        const savedArticles = state.feedItems.filter(i => state.savedIds.includes(i.id));
+        const total = savedArticles.length + state.savedBooks.length;
+        if (badgeEl) badgeEl.textContent = String(total);
+
+        if (!listEl) return;
+        if (total === 0) {
+          listEl.innerHTML = '<p class="text-slate-400 italic py-2">No items bookmarked yet. Click "Save to CPD" on any guideline, trial, or textbook.</p>';
+          return;
+        }
+
+        const articleHtml = savedArticles.map(a =>
+          '<div class="p-2 rounded-lg bg-slate-50 dark:bg-navy-800 border border-slate-200 dark:border-navy-700 flex items-start justify-between gap-2">' +
+            '<span class="font-medium text-navy-900 dark:text-slate-100 line-clamp-2">' + escapeHtml(a.title) + '</span>' +
+            '<button type="button" data-action="toggle-bookmark" data-id="' + escapeHtml(a.id) + '" class="text-slate-400 hover:text-rose-500 shrink-0">&times;</button>' +
+          '</div>'
+        ).join('');
+
+        const bookHtml = state.savedBooks.map(b =>
+          '<div class="p-2 rounded-lg bg-teal-50/60 dark:bg-navy-800 border border-teal-200 dark:border-teal-500/30 flex items-start justify-between gap-2">' +
+            '<span class="font-medium text-teal-900 dark:text-teal-300 line-clamp-2">[Book] ' + escapeHtml(b.title) + '</span>' +
+            '<button type="button" data-action="toggle-book" data-id="' + escapeHtml(b.id) + '" class="text-slate-400 hover:text-rose-500 shrink-0">&times;</button>' +
+          '</div>'
+        ).join('');
+
+        listEl.innerHTML = articleHtml + bookHtml;
+      }
+
+      /* ---------------- KPI & Charts Engine ---------------- */
+      function updateCohortKpis() {
+        const c = NDNS_COHORTS[state.cohort] || NDNS_COHORTS.adults;
+        if (!c) { renderCharts(); return; }
+        document.getElementById('kpiFiveADay').textContent = c.fiveADay;
+        document.getElementById('kpiFiveADayNote').textContent = c.fiveADayNote;
+        document.getElementById('kpiFibre').textContent = c.fibre;
+        document.getElementById('kpiFibreNote').textContent = c.fibreNote;
+        document.getElementById('kpiFibreTarget').textContent = c.fibreTarget;
+        document.getElementById('kpiSugars').textContent = c.sugars;
+        document.getElementById('kpiSugarsNote').textContent = c.sugarsNote;
+        renderCharts();
+      }
+
+      function getChartColors(forceLight) {
+        const isDark = !forceLight && document.documentElement.classList.contains('dark');
+        return {
+          text: isDark ? '#CBD5E1' : '#1E293B',
+          grid: isDark ? 'rgba(148, 163, 184, 0.14)' : 'rgba(15, 23, 42, 0.08)',
+          teal: '#0D9488',
+          tealFill: isDark ? 'rgba(45, 212, 191, 0.78)' : 'rgba(13, 148, 136, 0.85)',
+          navy: isDark ? '#38BDF8' : '#1B365D',
+          navyFill: isDark ? 'rgba(56, 189, 248, 0.75)' : 'rgba(27, 54, 93, 0.85)'
+        };
+      }
+
+      function renderCharts() {
+        if (typeof Chart === 'undefined') return;
+        const colors = getChartColors(false);
+        const cohortData = NDNS_COHORTS[state.cohort] || NDNS_COHORTS.adults;
+        if (!cohortData) return;
+        const isCompliance = state.ndnsChartMode === 'compliance';
+
+        const sub1 = document.getElementById('ndnsChartSubtitle');
+        if (sub1) {
+          sub1.textContent = 'Cohort: ' + cohortData.label + ' — ' +
+            (isCompliance ? '% meeting UK recommendation' : '% not meeting recommendation') + ' · NDNS 2019–23';
+        }
+
+        const ctx1 = document.getElementById('ndnsChart');
+        if (ctx1) {
+          if (state.ndnsChartInstance) state.ndnsChartInstance.destroy();
+          state.ndnsChartInstance = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+              labels: NDNS_LABELS,
+              datasets: [{
+                label: isCompliance ? 'Meeting recommendation (%)' : 'Not meeting (%)',
+                data: isCompliance ? cohortData.compliance : cohortData.deficit,
+                backgroundColor: isCompliance ? colors.tealFill : colors.navyFill,
+                borderRadius: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { labels: { color: colors.text, font: { size: 11 } } }
+              },
+              scales: {
+                x: { ticks: { color: colors.text, font: { size: 11 } }, grid: { display: false } },
+                y: {
+                  beginAtZero: true,
+                  max: 100,
+                  ticks: { color: colors.text, font: { size: 11 }, callback: v => v + '%' },
+                  grid: { color: colors.grid }
+                }
+              }
+            }
+          });
+        }
+
+        const isCost = state.onsChartMode === 'cost';
+        const sub2 = document.getElementById('onsChartSubtitle');
+        if (sub2) {
+          sub2.textContent = isCost
+            ? 'Healthier vs less healthy food, £ per 1,000 kcal (' + (state.onsLiveData.costSource || 'Food Foundation') + ')'
+            : 'ONS 12-month inflation, food & non-alcoholic drinks (gaps = month not confirmed)';
+        }
+
+        const ctx2 = document.getElementById('onsChart');
+        if (ctx2) {
+          if (state.onsChartInstance) state.onsChartInstance.destroy();
+          const d = state.onsLiveData;
+          state.onsChartInstance = new Chart(ctx2, isCost ? {
+            type: 'bar',
+            data: {
+              labels: d.costLabels,
+              datasets: [{
+                label: '£ per 1,000 kcal (2024)',
+                data: d.costValues,
+                backgroundColor: [colors.tealFill, colors.navyFill],
+                borderRadius: 6,
+                maxBarThickness: 90
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => '£' + Number(c.parsed.y).toFixed(2) + ' per 1,000 kcal' } }
+              },
+              scales: {
+                x: { ticks: { color: colors.text, font: { size: 11 } }, grid: { display: false } },
+                y: { beginAtZero: true, ticks: { color: colors.text, font: { size: 11 }, callback: v => '£' + Number(v).toFixed(2) }, grid: { color: colors.grid } }
+              }
+            }
+          } : {
+            type: 'line',
+            data: {
+              labels: d.months,
+              datasets: [{
+                label: 'Food & non-alcoholic drinks, 12-month rate (%)',
+                data: d.foodCpi,
+                borderColor: colors.teal,
+                backgroundColor: colors.tealFill,
+                pointRadius: 3.5,
+                tension: 0,
+                spanGaps: true,
+                borderWidth: 2.5
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { labels: { color: colors.text, font: { size: 11 } } },
+                tooltip: { callbacks: { label: c => c.parsed.y + '%' } }
+              },
+              scales: {
+                x: { ticks: { color: colors.text, font: { size: 11 } }, grid: { display: false } },
+                y: { beginAtZero: true, ticks: { color: colors.text, font: { size: 11 }, callback: v => v + '%' }, grid: { color: colors.grid } }
+              }
+            }
+          });
+        }
+      }
+
+      /* ---------------- Point-of-Care Clinical Calculators ---------------- */
+      function calculateMustScore() {
+        const w = parseFloat(document.getElementById('mustWeight').value) || 0;
+        const hCm = parseFloat(document.getElementById('mustHeight').value) || 0;
+        const prevW = parseFloat(document.getElementById('mustPrevWeight').value) || 0;
+        const acute = document.getElementById('mustAcuteEffect').checked;
+
+        if (w <= 0 || hCm <= 0) return;
+        const hM = hCm / 100;
+        const bmi = w / (hM * hM);
+
+        let bmiScore = 0;
+        if (bmi < 18.5) bmiScore = 2;
+        else if (bmi < 20.0) bmiScore = 1;
+
+        let wlPct = 0;
+        if (prevW > w) wlPct = ((prevW - w) / prevW) * 100;
+        let wlScore = 0;
+        if (wlPct > 10) wlScore = 2;
+        else if (wlPct >= 5) wlScore = 1;
+
+        const acuteScore = acute ? 2 : 0;
+        const total = bmiScore + wlScore + acuteScore;
+
+        const riskLevel = total >= 2 ? 'High Risk' : (total === 1 ? 'Medium Risk' : 'Low Risk');
+        document.getElementById('mustScoreLabel').textContent = "Total 'MUST' Score: " + total + " (" + riskLevel + ")";
+        document.getElementById('mustBmiBadge').textContent = 'BMI ' + bmi.toFixed(1);
+
+        let action = 'Routine clinical care: repeat screening weekly in hospital, monthly in care homes.';
+        if (total === 1) {
+          action = 'Unplanned weight loss: ' + wlPct.toFixed(1) + '%. Observe and document dietary/fluid intake for 3 days; fortify food if intake poor.';
+        } else if (total >= 2) {
+          action = 'Unplanned weight loss: ' + wlPct.toFixed(1) + '%. Refer to Dietitian / Nutrition Support Team; initiate food-first fortification & ONS care plan.';
+        }
+        document.getElementById('mustActionText').textContent = action;
+      }
+
+      function calculateRefeedingRisk() {
+        const majors = document.querySelectorAll('.refeed-major:checked').length;
+        const minors = document.querySelectorAll('.refeed-minor:checked').length;
+        const titleEl = document.getElementById('refeedRiskTitle');
+        const guideEl = document.getElementById('refeedRiskGuidance');
+
+        if (majors >= 1 || minors >= 2) {
+          titleEl.textContent = 'HIGH Refeeding Syndrome Risk (NICE CG32)';
+          guideEl.textContent = 'Start at a maximum of 10 kcal/kg/day (5 kcal/kg/day in extreme cases, e.g. BMI < 14 or negligible intake for > 15 days), increasing slowly to meet or exceed full needs by 4–7 days. Before feeding and for the first 10 days give oral thiamine 200–300 mg daily, vitamin B co strong 1–2 tablets three times a day (or full-dose IV vitamin B) and a balanced multivitamin/trace element supplement. Restore circulatory volume and monitor fluid balance, K+, PO4 and Mg2+.';
+        } else if (minors === 1) {
+          titleEl.textContent = 'Below NICE High-Risk Threshold';
+          guideEl.textContent = document.getElementById('refeedMinorIntake').checked
+            ? 'Little or no intake for > 5 days: NICE CG32 advises giving no more than 50% of requirements for the first 2 days, then increasing to full needs if clinical and biochemical monitoring shows no refeeding problems.'
+            : 'One minor criterion only. Not high risk under NICE CG32; monitor electrolytes per local protocol and reassess if intake or biochemistry changes.';
+        } else {
+          titleEl.textContent = 'Standard Refeeding Risk';
+          guideEl.textContent = 'No NICE CG32 high-risk criteria selected. Commence standard nutritional support and monitor U&Es per local trust protocol.';
+        }
+      }
+
+      /* ---------------- Offscreen High-DPI Chart Graphics for PDF ---------------- */
+      function buildFallbackGraphicPng(title, labels, values, unitSuffix, barColor) {
+        const c = document.createElement('canvas');
+        c.width = 860;
+        c.height = 440;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, c.width, c.height);
+
+        ctx.fillStyle = '#0A192F';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText(title, 28, 38);
+
+        const maxVal = Math.max(...values, 1);
+        const startX = 210;
+        const maxBarW = 540;
+        labels.forEach((lbl, i) => {
+          const y = 78 + i * 54;
+          ctx.fillStyle = '#1E293B';
+          ctx.font = '15px sans-serif';
+          ctx.fillText(lbl, 28, y + 22);
+
+          ctx.fillStyle = '#E2E8F0';
+          ctx.fillRect(startX, y, maxBarW, 30);
+
+          const w = Math.round((values[i] / maxVal) * maxBarW);
+          ctx.fillStyle = barColor;
+          ctx.fillRect(startX, y, w, 30);
+
+          ctx.fillStyle = '#0A192F';
+          ctx.font = 'bold 15px sans-serif';
+          ctx.fillText(values[i] + unitSuffix, startX + w + 10, y + 22);
+        });
+        return c.toDataURL('image/png');
+      }
+
+      function renderOffscreenChartsForPdf() {
+        const cohortData = NDNS_COHORTS[state.cohort] || NDNS_COHORTS.adults;
+        const isCompliance = state.ndnsChartMode === 'compliance';
+        const isCost = state.onsChartMode === 'cost';
+        const d = state.onsLiveData;
+        const ndnsValues = isCompliance ? cohortData.compliance : cohortData.deficit;
+
+        let chart1Png = null;
+        let chart2Png = null;
+
+        if (typeof Chart !== 'undefined') {
+          try {
+            const whiteBgPlugin = {
+              id: 'pdfWhiteBg',
+              beforeDraw(chart) {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+              }
+            };
+            const axes = (money) => ({
+              x: { ticks: { color: '#1E293B', font: { size: 14 } } },
+              y: { beginAtZero: true, ticks: { color: '#1E293B', font: { size: 14 }, callback: v => money ? '£' + v : v + '%' } }
+            });
+
+            const c1 = document.createElement('canvas');
+            c1.width = 860;
+            c1.height = 440;
+            const inst1 = new Chart(c1.getContext('2d'), {
+              type: 'bar',
+              plugins: [whiteBgPlugin],
+              data: {
+                labels: NDNS_LABELS,
+                datasets: [{
+                  label: cohortData.label + (isCompliance ? ' — meeting recommendation (%)' : ' — not meeting (%)'),
+                  data: ndnsValues,
+                  backgroundColor: isCompliance ? '#0D9488' : '#1B365D'
+                }]
+              },
+              options: {
+                animation: false,
+                responsive: false,
+                plugins: { legend: { labels: { color: '#0A192F', font: { size: 15 } } } },
+                scales: Object.assign(axes(false), { y: { beginAtZero: true, max: 100, ticks: { color: '#1E293B', font: { size: 14 } } } })
+              }
+            });
+            chart1Png = c1.toDataURL('image/png');
+            inst1.destroy();
+
+            const c2 = document.createElement('canvas');
+            c2.width = 860;
+            c2.height = 440;
+            const inst2 = new Chart(c2.getContext('2d'), isCost ? {
+              type: 'bar',
+              plugins: [whiteBgPlugin],
+              data: { labels: d.costLabels, datasets: [{ label: '£ per 1,000 kcal (Food Foundation, 2024)', data: d.costValues, backgroundColor: ['#0D9488', '#1B365D'] }] },
+              options: { animation: false, responsive: false, plugins: { legend: { labels: { color: '#0A192F', font: { size: 15 } } } }, scales: axes(true) }
+            } : {
+              type: 'line',
+              plugins: [whiteBgPlugin],
+              data: { labels: d.months, datasets: [{ label: 'ONS food & non-alcoholic drinks, 12-month rate (%)', data: d.foodCpi, borderColor: '#0D9488', borderWidth: 4, tension: 0, spanGaps: true }] },
+              options: { animation: false, responsive: false, plugins: { legend: { labels: { color: '#0A192F', font: { size: 15 } } } }, scales: axes(false) }
+            });
+            chart2Png = c2.toDataURL('image/png');
+            inst2.destroy();
+          } catch (e) {}
+        }
+
+        const known = (labels, values) => {
+          const l = [], v = [];
+          labels.forEach((x, i) => { if (values[i] != null) { l.push(x); v.push(values[i]); } });
+          return { l, v };
+        };
+        if (!chart1Png) {
+          const k = known(NDNS_LABELS, ndnsValues);
+          chart1Png = buildFallbackGraphicPng('NDNS 2019–23: ' + cohortData.label, k.l, k.v, '%', '#0D9488');
+        }
+        if (!chart2Png) {
+          const k = isCost ? known(d.costLabels, d.costValues) : known(d.months, d.foodCpi);
+          chart2Png = buildFallbackGraphicPng(
+            isCost ? 'Food cost (£ / 1,000 kcal, 2024)' : 'UK food inflation, 12-month rate (%)',
+            k.l, k.v, isCost ? ' £' : '%', '#1B365D'
+          );
+        }
+
+        return { chart1Png, chart2Png };
+      }
+
+      function isCostFig() { return state.onsChartMode === 'cost'; }
+
+      /* ---------------- Executive Briefing PDF Generator ---------------- */
+      function exportClinicalBriefingPdf(singleItem) {
+        const jspdfLib = window.jspdf;
+        if (!jspdfLib || !jspdfLib.jsPDF) {
+          window.print();
+          return;
+        }
+
+        const doc = new jspdfLib.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageW = doc.internal.pageSize.getWidth();
+        const nowStr = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+        const cohortData = NDNS_COHORTS[state.cohort] || NDNS_COHORTS.adults;
+
+        // Header Banner (Navy & Teal)
+        doc.setFillColor(10, 25, 47);
+        doc.rect(0, 0, pageW, 28, 'F');
+        doc.setFillColor(13, 148, 136);
+        doc.rect(0, 28, pageW, 2, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.setFont('helvetica', 'bold');
+        doc.text('UK Clinical Dietetics Intelligence & Public Health Briefing', 14, 13);
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(153, 246, 228);
+        doc.text('Generated: ' + nowStr + ' | Cohort: ' + cohortData.label + ' | HCPC / BDA / NICE / ONS', 14, 21);
+
+        let y = 37;
+
+        // Section 1: KPI Summary Table
+        doc.setTextColor(10, 25, 47);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('1. UK Public Health & Economic Surveillance Snapshot', 14, y);
+        y += 3;
+
+        const runAutoTable = (opts) => {
+          if (typeof doc.autoTable === 'function') {
+            doc.autoTable(opts);
+          } else if (typeof jspdfLib.autoTable === 'function') {
+            jspdfLib.autoTable(doc, opts);
+          }
+        };
+
+        runAutoTable({
+          startY: y,
+          head: [['Surveillance Indicator', 'Current Figure', 'Context / Benchmark']],
+          body: [
+            ['NDNS 5 A Day (2019–23)', cohortData.fiveADay, cohortData.fiveADayNote + ' (target: >=400 g/day)'],
+            ['Not meeting fibre recommendation', cohortData.fibre, cohortData.fibreNote + ' (' + cohortData.fibreTarget + ')'],
+            ['Free sugars (% total energy)', cohortData.sugars, cohortData.sugarsNote + ' (SACN maximum: 5%)'],
+            ['ONS food inflation, 12-month rate', DATA ? DATA.kpis.foodCpi.value : '—', DATA ? DATA.kpis.foodCpi.note + '. ' + DATA.kpis.foodCpi.footnote : '']
+          ],
+          theme: 'grid',
+          headStyles: { fillColor: [10, 25, 47], textColor: [255, 255, 255], fontSize: 8.5 },
+          bodyStyles: { fontSize: 8.5, textColor: [30, 41, 59] },
+          margin: { left: 14, right: 14 }
+        });
+
+        y = (doc.lastAutoTable && doc.lastAutoTable.finalY ? doc.lastAutoTable.finalY : y + 36) + 7;
+
+        // Section 2: Embedded High-DPI Surveillance Graphics
+        doc.setTextColor(10, 25, 47);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('2. Population Surveillance & Inflation Graphics', 14, y);
+        y += 3;
+
+        const { chart1Png, chart2Png } = renderOffscreenChartsForPdf();
+        const imgW = 88;
+        const imgH = 45;
+
+        doc.setDrawColor(203, 213, 225);
+        doc.rect(14, y, imgW, imgH);
+        doc.addImage(chart1Png, 'PNG', 14.5, y + 0.5, imgW - 1, imgH - 1);
+
+        doc.rect(108, y, imgW, imgH);
+        doc.addImage(chart2Png, 'PNG', 108.5, y + 0.5, imgW - 1, imgH - 1);
+
+        y += imgH + 4;
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(100, 116, 139);
+        doc.text('Fig 1: NDNS 2019–23 (' + cohortData.label + ')', 14, y);
+        doc.text(isCostFig() ? 'Fig 2: Food cost per 1,000 kcal (Food Foundation)' : 'Fig 2: ONS food inflation, 12-month rate', 108, y);
+        y += 7;
+
+        // Section 3: Clinical Guidance & Evidence Synthesis
+        doc.setTextColor(10, 25, 47);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('3. NHS, NICE & Clinical Research Intelligence', 14, y);
+        y += 3;
+
+        const itemsForPdf = singleItem
+          ? [singleItem]
+          : (state.savedIds.length > 0
+              ? state.feedItems.filter(i => state.savedIds.includes(i.id))
+              : state.feedItems.slice(0, 6));
+
+        runAutoTable({
+          startY: y,
+          head: [['Source / Date', 'Guidance / Study Title', 'Dietetic Practice Implications']],
+          body: itemsForPdf.map(it => [
+            it.source + '\n(' + it.date + ')',
+            it.title,
+            it.implications
+          ]),
+          theme: 'striped',
+          headStyles: { fillColor: [13, 148, 136], textColor: [255, 255, 255], fontSize: 8.5 },
+          bodyStyles: { fontSize: 8, textColor: [30, 41, 59] },
+          columnStyles: { 0: { cellWidth: 34 }, 1: { cellWidth: 68 }, 2: { cellWidth: 80 } },
+          margin: { left: 14, right: 14 }
+        });
+
+        y = (doc.lastAutoTable && doc.lastAutoTable.finalY ? doc.lastAutoTable.finalY : y + 50) + 7;
+
+        // Section 4: Recommended / Saved Google Books Literature
+        if (y > 245) {
+          doc.addPage();
+          y = 18;
+        }
+        doc.setTextColor(10, 25, 47);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('4. Recommended & Saved Reference Texts (Google Books)', 14, y);
+        y += 3;
+
+        const booksForPdf = state.savedBooks.length > 0 ? state.savedBooks : state.books.slice(0, 4);
+        runAutoTable({
+          startY: y,
+          head: [['Title', 'Author(s)', 'Publisher / Year']],
+          body: booksForPdf.map(b => [b.title, b.authors, b.publisher + ' (' + b.year + ')']),
+          theme: 'grid',
+          headStyles: { fillColor: [27, 54, 93], textColor: [255, 255, 255], fontSize: 8.5 },
+          bodyStyles: { fontSize: 8, textColor: [30, 41, 59] },
+          margin: { left: 14, right: 14 }
+        });
+
+        const filename = singleItem
+          ? 'Clinical-Briefing-' + singleItem.id + '.pdf'
+          : 'UK-Clinical-Dietetics-Briefing-2026.pdf';
+
+        if (!IS_EMBEDDED) {
+          try {
+            doc.save(filename);
+          } catch (e) {}
+        }
+
+        // Also prepare preview modal fallback if sandbox restricts direct downloads
+        try {
+          const blob = doc.output('blob');
+          const url = URL.createObjectURL(blob);
+          const dlLink = document.getElementById('pdfDirectDownloadLink');
+          const frame = document.getElementById('pdfPreviewFrame');
+          if (dlLink) {
+            dlLink.href = url;
+            dlLink.download = filename;
+          }
+          if (frame) frame.src = url;
+          if (IS_EMBEDDED) {
+            const pm = document.getElementById('pdfPreviewModal');
+            pm.classList.remove('hidden');
+            pm.classList.add('flex');
+          }
+        } catch (e) {}
+      }
+
+      /* ---------------- Modal Handlers ---------------- */
+      function openDetailModal(itemId) {
+        const item = state.feedItems.find(i => i.id === itemId);
+        if (!item) return;
+        state.activeModalItem = item;
+
+        document.getElementById('modalMetaBadge').textContent = item.source + ' • ' + item.evidenceGrade;
+        document.getElementById('modalTitle').textContent = item.title;
+        document.getElementById('modalSubMeta').textContent = 'Published: ' + item.date + '  |  Specialty: ' + item.topic;
+        document.getElementById('modalSummary').textContent = item.summary;
+        document.getElementById('modalImplications').textContent = item.implications;
+        document.getElementById('modalExternalLink').href = item.url || '#';
+
+        const isSaved = state.savedIds.includes(item.id);
+        document.getElementById('modalBookmarkBtn').querySelector('span').textContent = isSaved ? 'Saved in CPD' : 'Save to CPD';
+
+        const modal = document.getElementById('detailModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      function closeDetailModal() {
+        const modal = document.getElementById('detailModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+
+      function toggleBookmark(id) {
+        const idx = state.savedIds.indexOf(id);
+        if (idx >= 0) state.savedIds.splice(idx, 1);
+        else state.savedIds.push(id);
+        safeStorage.set('dietetics_saved_ids', JSON.stringify(state.savedIds));
+        renderFeed();
+        renderSavedSidebar();
+        if (state.activeModalItem && state.activeModalItem.id === id) {
+          const isSaved = state.savedIds.includes(id);
+          document.getElementById('modalBookmarkBtn').querySelector('span').textContent = isSaved ? 'Saved in CPD' : 'Save to CPD';
+        }
+      }
+
+      function toggleBookSave(id) {
+        const idx = state.savedBooks.findIndex(b => b.id === id);
+        if (idx >= 0) {
+          state.savedBooks.splice(idx, 1);
+        } else {
+          const book = state.books.find(b => b.id === id);
+          if (book) state.savedBooks.push(book);
+        }
+        safeStorage.set('dietetics_saved_books', JSON.stringify(state.savedBooks));
+        renderBooks();
+        renderSavedSidebar();
+      }
+
+      /* ---------------- Theme Toggle ---------------- */
+      function syncThemeIcons() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const sun = document.getElementById('sunIcon');
+        const moon = document.getElementById('moonIcon');
+        if (sun) sun.classList.toggle('hidden', !isDark);
+        if (moon) moon.classList.toggle('hidden', isDark);
+      }
+
+      /* ---------------- Event Wiring ---------------- */
+      function bindEvents() {
+        // Theme toggle
+        document.getElementById('themeToggleBtn').addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          safeStorage.set('dietetics_theme', isDark ? 'dark' : 'light');
+          syncThemeIcons();
+          renderCharts();
+        });
+
+        // Nav Tabs
+        document.querySelectorAll('.nav-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.nav-tab').forEach(b => {
+              b.classList.remove('active', 'bg-teal-600', 'text-white');
+              b.classList.add('text-slate-300');
+            });
+            btn.classList.add('active', 'bg-teal-600', 'text-white');
+            btn.classList.remove('text-slate-300');
+
+            state.activeTab = btn.dataset.tab;
+            const chartsSec = document.getElementById('chartsSection');
+            const feedSec = document.getElementById('feedSection');
+            const booksSec = document.getElementById('booksSection');
+
+            if (state.activeTab === 'books') {
+              chartsSec.classList.add('hidden');
+              feedSec.classList.add('hidden');
+              booksSec.classList.remove('hidden');
+            } else {
+              chartsSec.classList.remove('hidden');
+              feedSec.classList.remove('hidden');
+              booksSec.classList.remove('hidden');
+              renderFeed();
+            }
+          });
+        });
+
+        // Topic Filter Pills
+        document.querySelectorAll('.topic-pill').forEach(pill => {
+          pill.addEventListener('click', () => {
+            document.querySelectorAll('.topic-pill').forEach(p => {
+              p.classList.remove('active', 'bg-navy-800', 'text-white', 'dark:bg-teal-600');
+              p.classList.add('bg-slate-100', 'dark:bg-navy-800', 'text-slate-700', 'dark:text-slate-300');
+            });
+            pill.classList.add('active', 'bg-navy-800', 'text-white', 'dark:bg-teal-600');
+            pill.classList.remove('bg-slate-100', 'text-slate-700', 'dark:text-slate-300');
+            state.topicFilter = pill.dataset.topic;
+            renderFeed();
+          });
+        });
+
+        // Search & Evidence Filter
+        let searchDebounce = null;
+        document.getElementById('searchInput').addEventListener('input', e => {
+          state.searchQuery = e.target.value;
+          renderFeed();
+          clearTimeout(searchDebounce);
+          if (state.searchQuery.trim().length >= 4) {
+            searchDebounce = setTimeout(() => syncAllLiveFeeds(state.searchQuery), 750);
+          }
+        });
+
+        document.getElementById('evidenceFilter').addEventListener('change', e => {
+          state.evidenceFilter = e.target.value;
+          renderFeed();
+        });
+
+        document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+          state.searchQuery = '';
+          state.topicFilter = 'all';
+          state.evidenceFilter = 'all';
+          document.getElementById('searchInput').value = '';
+          document.getElementById('evidenceFilter').value = 'all';
+          refreshEnhancedSelects();
+          document.querySelectorAll('.topic-pill').forEach((p, idx) => {
+            if (idx === 0) {
+              p.classList.add('active', 'bg-navy-800', 'text-white', 'dark:bg-teal-600');
+              p.classList.remove('bg-slate-100', 'text-slate-700', 'dark:text-slate-300');
+            } else {
+              p.classList.remove('active', 'bg-navy-800', 'text-white', 'dark:bg-teal-600');
+              p.classList.add('bg-slate-100', 'dark:bg-navy-800', 'text-slate-700', 'dark:text-slate-300');
+            }
+          });
+          renderFeed();
+        });
+
+        // NDNS Cohort & Chart Mode Switches
+        document.getElementById('ndnsCohortSelect').addEventListener('change', e => {
+          state.cohort = e.target.value;
+          updateCohortKpis();
+        });
+
+        document.querySelectorAll('.ndns-mode-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.ndns-mode-btn').forEach(b => {
+              b.classList.remove('bg-teal-600', 'text-white', 'font-semibold');
+              b.classList.add('text-slate-600', 'dark:text-slate-300');
+            });
+            btn.classList.add('bg-teal-600', 'text-white', 'font-semibold');
+            btn.classList.remove('text-slate-600', 'dark:text-slate-300');
+            state.ndnsChartMode = btn.dataset.ndnsMode;
+            renderCharts();
+          });
+        });
+
+        document.querySelectorAll('.ons-mode-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.ons-mode-btn').forEach(b => {
+              b.classList.remove('bg-teal-600', 'text-white', 'font-semibold');
+              b.classList.add('text-slate-600', 'dark:text-slate-300');
+            });
+            btn.classList.add('bg-teal-600', 'text-white', 'font-semibold');
+            btn.classList.remove('text-slate-600', 'dark:text-slate-300');
+            state.onsChartMode = btn.dataset.onsMode;
+            renderCharts();
+          });
+        });
+
+        // Google Books Search & Topic Chips
+        document.getElementById('bookSearchForm').addEventListener('submit', e => {
+          e.preventDefault();
+          const q = document.getElementById('bookSearchInput').value.trim();
+          if (q) searchGoogleBooks(q, false);
+        });
+
+        document.querySelectorAll('.book-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            const q = chip.dataset.bookQuery;
+            document.getElementById('bookSearchInput').value = q;
+            searchGoogleBooks(q, false);
+          });
+        });
+
+        // Delegated Click Events for Cards, Books & Saved Sidebar
+        document.body.addEventListener('click', e => {
+          const target = e.target.closest('[data-action]');
+          if (!target) return;
+          const action = target.dataset.action;
+          const id = target.dataset.id;
+          if (action === 'open-modal') openDetailModal(id);
+          else if (action === 'toggle-bookmark') toggleBookmark(id);
+          else if (action === 'toggle-book') toggleBookSave(id);
+        });
+
+        // Modal Controls
+        document.getElementById('closeModalBtn').addEventListener('click', closeDetailModal);
+        document.getElementById('detailModal').addEventListener('click', e => {
+          if (e.target.id === 'detailModal') closeDetailModal();
+        });
+        document.getElementById('modalBookmarkBtn').addEventListener('click', () => {
+          if (state.activeModalItem) toggleBookmark(state.activeModalItem.id);
+        });
+        document.getElementById('modalExportSinglePdfBtn').addEventListener('click', () => {
+          if (state.activeModalItem) exportClinicalBriefingPdf(state.activeModalItem);
+        });
+
+        // PDF Export Triggers
+        document.getElementById('exportPdfBtn').addEventListener('click', () => exportClinicalBriefingPdf(null));
+        document.getElementById('exportBooksPdfBtn').addEventListener('click', () => exportClinicalBriefingPdf(null));
+        document.getElementById('sidebarExportPdfBtn').addEventListener('click', () => exportClinicalBriefingPdf(null));
+        document.getElementById('closePdfPreviewBtn').addEventListener('click', () => {
+          const m = document.getElementById('pdfPreviewModal');
+          m.classList.add('hidden');
+          m.classList.remove('flex');
+        });
+
+        // Clear Saved CPD
+        document.getElementById('clearSavedBtn').addEventListener('click', () => {
+          state.savedIds = [];
+          state.savedBooks = [];
+          safeStorage.set('dietetics_saved_ids', '[]');
+          safeStorage.set('dietetics_saved_books', '[]');
+          renderFeed();
+          renderBooks();
+          renderSavedSidebar();
+        });
+
+        // Sync & Auto-Refresh
+        document.getElementById('syncLiveBtn').addEventListener('click', () => syncAllLiveFeeds(state.searchQuery));
+        document.getElementById('autoRefreshToggle').addEventListener('change', e => {
+          if (state.autoRefreshTimer) {
+            clearInterval(state.autoRefreshTimer);
+            state.autoRefreshTimer = null;
+          }
+          if (e.target.checked) {
+            state.autoRefreshTimer = setInterval(() => syncAllLiveFeeds(state.searchQuery), 300000);
+          }
+        });
+
+        // Clinical Calculators
+        ['mustWeight', 'mustHeight', 'mustPrevWeight', 'mustAcuteEffect'].forEach(id => {
+          document.getElementById(id).addEventListener('input', calculateMustScore);
+          document.getElementById(id).addEventListener('change', calculateMustScore);
+        });
+        document.querySelectorAll('.refeed-major, .refeed-minor').forEach(cb => {
+          cb.addEventListener('change', calculateRefeedingRisk);
+        });
+      }
+
+      /* ---------------- Boot Sequence ---------------- */
+      document.addEventListener('DOMContentLoaded', async () => {
+        syncThemeIcons();
+        document.querySelectorAll('#ndnsCohortSelect, #evidenceFilter').forEach(enhanceSelect);
+        bindEvents();
+        calculateMustScore();
+        calculateRefeedingRisk();
+        await loadData();
+        updateCohortKpis();
+        renderFeed();
+        renderBooks();
+        renderSavedSidebar();
+        refreshEnhancedSelects();
+
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          try { window.lucide.createIcons(); } catch (e) {}
+        }
+
+        syncAllLiveFeeds();
+      });
+    })();
+  </script>
+</body>
+</html>
