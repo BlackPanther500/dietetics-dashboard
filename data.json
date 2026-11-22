@@ -1,0 +1,315 @@
+{
+  "updated": "2026-11-22",
+  "sources": [
+    "ONS CPI: Oct 2026",
+    "NDNS 2019–23",
+    "GOV.UK / DHSC / OHID",
+    "NICE · SACN · FSA"
+  ],
+  "kpis": {
+    "foodCpi": {
+      "value": "0.9%",
+      "note": "from 4.9% a year ago",
+      "footnote": "12-month rate, food & non-alcoholic drinks, October 2026",
+      "url": "https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/consumerpriceinflation/october2026"
+    }
+  },
+  "ndns": {
+    "labels": [
+      "5 A Day",
+      "Fibre target",
+      "Free sugars ≤5%",
+      "Sat fat ≤10%",
+      "Vit D not deficient"
+    ],
+    "cohorts": {
+      "adults": {
+        "label": "Adults (19–64 yrs)",
+        "fiveADay": "17%",
+        "fiveADayNote": "meet 5 A Day",
+        "fibre": "96%",
+        "fibreNote": "Mean 16.4 g/day",
+        "fibreTarget": "SACN recommendation: 30 g AOAC fibre/day",
+        "sugars": "10.0%",
+        "sugarsNote": "2.0× SACN maximum",
+        "compliance": [
+          17,
+          4,
+          19,
+          18,
+          82
+        ],
+        "deficit": [
+          83,
+          96,
+          81,
+          82,
+          18
+        ]
+      },
+      "adolescents": {
+        "label": "Adolescents (11–18 yrs)",
+        "fiveADay": "9%",
+        "fiveADayNote": "meet 5 A Day",
+        "fibre": "96%",
+        "fibreNote": "Mean 15.4 g/day",
+        "fibreTarget": "SACN recommendation: 25 g/day (11–16), 30 g/day (16–18)",
+        "sugars": "—",
+        "sugarsNote": "no 11–18 figure in summary",
+        "compliance": [
+          9,
+          4,
+          null,
+          null,
+          77
+        ],
+        "deficit": [
+          91,
+          96,
+          null,
+          null,
+          23
+        ]
+      }
+    }
+  },
+  "ons": {
+    "months": [
+      "Sep 25",
+      "Oct 25",
+      "Nov 25",
+      "Dec 25",
+      "Jan 26",
+      "Feb 26",
+      "Mar 26",
+      "Apr 26",
+      "May 26",
+      "Jun 26",
+      "Jul 26",
+      "Aug 26",
+      "Sep 26",
+      "Oct 26"
+    ],
+    "foodCpi": [
+      4.5,
+      4.9,
+      null,
+      4.5,
+      3.6,
+      null,
+      null,
+      null,
+      2.2,
+      1.7,
+      1.3,
+      1.3,
+      1.3,
+      0.9
+    ],
+    "costLabels": [
+      "Healthier foods",
+      "Less healthy foods"
+    ],
+    "costValues": [
+      8.8,
+      4.3
+    ],
+    "costSource": "Food Foundation, Broken Plate 2025 (2024 prices)"
+  },
+  "feed": [
+    {
+      "id": "ons-cpi-2026-10",
+      "category": "ons",
+      "source": "ONS",
+      "date": "2026-11-18",
+      "evidenceGrade": "National Surveillance (ONS/NDNS)",
+      "topic": "Public Health & NPM",
+      "title": "Consumer price inflation, UK: October 2026",
+      "summary": "Food and non-alcoholic beverage prices rose 0.9% in the 12 months to October 2026, down from 1.3% in September and the lowest rate since 2021. Headline CPI rose to 3.6%.",
+      "implications": "Food price growth has slowed, but prices have not fallen. Keep screening for food insecurity and building low-cost options (tinned and frozen produce, pulses, own-brand staples) into care plans.",
+      "url": "https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/consumerpriceinflation/october2026"
+    },
+    {
+      "id": "sacn-free-sugars-fv-2026",
+      "category": "nhs",
+      "source": "SACN",
+      "date": "2026-11-10",
+      "evidenceGrade": "Statutory / NICE Guidance",
+      "topic": "Public Health & NPM",
+      "title": "Free sugars in processed fruit and vegetables: SACN statement",
+      "summary": "SACN revisits the conclusions of its 2015 Carbohydrates and Health report on which sugars in processed fruit and vegetable products count as free sugars.",
+      "implications": "Read the statement before updating patient advice or resources on juices, smoothies, purées and other processed fruit and vegetable products.",
+      "url": "https://www.gov.uk/government/publications/free-sugars-in-processed-fruit-and-vegetables-sacn-statement/free-sugars-in-processed-fruit-and-vegetables-sacn-statement-summary"
+    },
+    {
+      "id": "ohid-diabetes-2026-04",
+      "category": "ons",
+      "source": "OHID",
+      "date": "2026-04",
+      "evidenceGrade": "National Surveillance (ONS/NDNS)",
+      "topic": "Obesity & GLP-1",
+      "title": "Diabetes profile: statistical commentary, April 2026",
+      "summary": "Just over 152,000 adults aged 19 to 39 in England had diagnosed type 2 diabetes at March 2024 (0.83%). GP-recorded type 2 prevalence in adults aged 17+ was 7.0%, up from 6.8% a year earlier. NDA reporting changes start a new time series for some indicators.",
+      "implications": "Expect more young adults with type 2 diabetes in weight management and diabetes clinics. Do not compare newer NDA figures with audit periods before 2024–25.",
+      "url": "https://www.gov.uk/government/statistics/diabetes-profile-update-april-2026/diabetes-profile-statistical-commentary-april-2026"
+    },
+    {
+      "id": "fsa-fy2-w11",
+      "category": "ons",
+      "source": "Food Standards Agency",
+      "date": "2026-03-31",
+      "evidenceGrade": "National Surveillance (ONS/NDNS)",
+      "topic": "Public Health & NPM",
+      "title": "Food and You 2, Wave 11: key findings",
+      "summary": "The first annual wave of the FSA survey (fieldwork to March 2026). It measures food insecurity with the USDA module, plus food bank and social supermarket use, across England, Wales and Northern Ireland.",
+      "implications": "Use the wave 11 tables for current local food insecurity context. The survey is now annual, with Wave 12 due in spring 2027.",
+      "url": "https://www.food.gov.uk/research/food-and-you-2/food-and-you-2-wave-11-key-findings"
+    },
+    {
+      "id": "trussell-2025",
+      "category": "ons",
+      "source": "Trussell",
+      "date": "2026-03-11",
+      "evidenceGrade": "National Surveillance (ONS/NDNS)",
+      "topic": "Public Health & NPM",
+      "title": "Food banks provided over 2.6 million emergency food parcels in 2025",
+      "summary": "Trussell food banks gave out over 2.6 million emergency parcels in calendar year 2025, down 12% on about 3 million in 2024. Trussell now reports by calendar year rather than April to March.",
+      "implications": "Need remains high. Know local food bank referral routes, and remember that parcel contents can be hard to fit to therapeutic diets.",
+      "url": "https://www.trussell.org.uk/news-and-research/news/food-banks-provide-over-2.6-million-food-parcels"
+    },
+    {
+      "id": "sacn-maternal-weight-2026",
+      "category": "nhs",
+      "source": "SACN",
+      "date": "2026-02-03",
+      "evidenceGrade": "Statutory / NICE Guidance",
+      "topic": "Public Health & NPM",
+      "title": "Nutrition and maternal weight outcomes: SACN report",
+      "summary": "A SACN risk assessment of how diet relates to maternal weight outcomes in pregnancy and up to 24 months after delivery.",
+      "implications": "Relevant to antenatal and postnatal weight and diet advice. Check the report’s conclusions before revising local maternity resources.",
+      "url": "https://www.gov.uk/government/publications/nutrition-and-maternal-weight-outcomes-sacn-report"
+    },
+    {
+      "id": "hse-2024",
+      "category": "ons",
+      "source": "NHS England · Health Survey for England",
+      "date": "2026-01-27",
+      "evidenceGrade": "National Surveillance (ONS/NDNS)",
+      "topic": "Obesity & GLP-1",
+      "title": "Health Survey for England 2024: adult overweight and obesity",
+      "summary": "30% of adults in England were living with obesity in 2024 and 66% were overweight or living with obesity, from measured height and weight. Obesity rose from 15% in 1993 to 25% in 2008, then more slowly.",
+      "implications": "Use HSE (measured) rather than Active Lives (self-reported, lower) when quoting national adult obesity prevalence.",
+      "url": "https://digital.nhs.uk/data-and-information/publications/statistical/health-survey-for-england/2024/adults-overweight-and-obesity"
+    },
+    {
+      "id": "nice-ng246-resources",
+      "category": "nhs",
+      "source": "NICE NG246",
+      "date": "2026-01-08",
+      "evidenceGrade": "Statutory / NICE Guidance",
+      "topic": "Obesity & GLP-1",
+      "title": "NG246 overweight and obesity management: baseline assessment tool updated",
+      "summary": "NICE updated the baseline assessment tool for its overweight and obesity management guideline. Resources include a practical guide to obesity medicines and a tirzepatide discussion aid.",
+      "implications": "Use the NG246 resources when auditing local weight management pathways and when discussing medicines alongside diet and activity support.",
+      "url": "https://www.nice.org.uk/guidance/ng246/resources"
+    },
+    {
+      "id": "lhf-ad-restrictions",
+      "category": "nhs",
+      "source": "DHSC",
+      "date": "2026-01-05",
+      "evidenceGrade": "Statutory / NICE Guidance",
+      "topic": "Public Health & NPM",
+      "title": "Less healthy food advertising restrictions come into force",
+      "summary": "From 5 January 2026, UK-wide rules ban TV adverts for less healthy food and drink between 5:30am and 9pm and ban paid-for online adverts at all times. Brand-only adverts and SMEs are exempt.",
+      "implications": "Useful context for public health and paediatric work. Brand-only advertising and radio, print and outdoor adverts are not covered.",
+      "url": "https://www.gov.uk/government/collections/less-healthy-food-or-drink-advertising-and-promotions-restrictions"
+    },
+    {
+      "id": "lancet-upf-series",
+      "category": "research",
+      "source": "The Lancet",
+      "date": "2025-11-18",
+      "evidenceGrade": "Peer-Reviewed Review / Series",
+      "topic": "Public Health & NPM",
+      "title": "Ultra-processed foods and human health (three-paper series)",
+      "summary": "The series argues that ultra-processed foods displacing traditional diets drive the rising burden of diet-related chronic disease. The authors say more evidence is needed on how UPFs cause harm, and critics dispute some policy conclusions.",
+      "implications": "The evidence is largely observational. Frame advice around overall diet quality and nutrients rather than processing level alone.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41270766/"
+    },
+    {
+      "id": "ncmp-2024-25",
+      "category": "ons",
+      "source": "DHSC · NCMP",
+      "date": "2025-11-04",
+      "evidenceGrade": "National Surveillance (ONS/NDNS)",
+      "topic": "Paediatric & ARFID",
+      "title": "National Child Measurement Programme, 2024 to 2025",
+      "summary": "Obesity prevalence was 10.5% in Reception (up from 9.6%, the highest outside the pandemic since 2006/07) and 22.2% in Year 6. Severe obesity was 2.9% and 5.6%. Rates in the most deprived areas were about double those in the least deprived.",
+      "implications": "Rising Reception prevalence and the deprivation gap support targeting early-years family weight services in deprived areas.",
+      "url": "https://www.gov.uk/government/statistics/national-child-measurement-programme-ncmp-annual-report-academic-year-2024-to-2025-england"
+    },
+    {
+      "id": "nice-ta1026",
+      "category": "nhs",
+      "source": "NICE TA1026",
+      "date": "2025-09-01",
+      "evidenceGrade": "Statutory / NICE Guidance",
+      "topic": "Obesity & GLP-1",
+      "title": "Tirzepatide for managing overweight and obesity (TA1026)",
+      "summary": "Recommended alongside a reduced-calorie diet and increased physical activity for adults with an initial BMI of at least 35 kg/m² and at least one weight-related condition. BMI thresholds are usually 2.5 kg/m² lower for some ethnic groups. NHS England is phasing access by cohort.",
+      "implications": "Dietary and activity support is part of the recommendation. Plan for adequate protein, hydration and monitoring of intake during rapid weight loss.",
+      "url": "https://www.nice.org.uk/guidance/TA1026/chapter/recommendations"
+    },
+    {
+      "id": "ndns-2019-2023",
+      "category": "ons",
+      "source": "OHID / FSA · NDNS",
+      "date": "2025-06-11",
+      "evidenceGrade": "National Surveillance (ONS/NDNS)",
+      "topic": "Malnutrition & Frailty",
+      "title": "National Diet and Nutrition Survey 2019 to 2023",
+      "summary": "96% of adults and 11–18 year olds miss the fibre recommendation; 17% of adults and 9% of 11–18 year olds meet 5 A Day. 18% of adults aged 19–64 had vitamin D deficiency (31% in January to March) and 23% of 11–18 year olds (36% in winter).",
+      "implications": "Reinforce 10 µg/day vitamin D in autumn and winter (year-round for at-risk groups) and practical ways to raise fibre. Intake24 replaced paper diaries in 2019, so take care comparing with earlier years.",
+      "url": "https://www.gov.uk/government/statistics/national-diet-and-nutrition-survey-2019-to-2023/national-diet-and-nutrition-survey-2019-to-2023-report"
+    }
+  ],
+  "books": [
+    {
+      "id": "book-bda-manual-6",
+      "title": "Manual of Dietetic Practice (6th Edition)",
+      "authors": "Joan Gandy (Editor), British Dietetic Association",
+      "year": "2019",
+      "publisher": "Wiley-Blackwell",
+      "description": "The BDA’s core UK reference for dietetic practice, covering nutritional assessment, medical nutrition therapy across clinical specialties and public health nutrition.",
+      "link": "https://books.google.co.uk/books?q=isbn:9781119235927"
+    },
+    {
+      "id": "book-paed-dietetics-5",
+      "title": "Clinical Paediatric Dietetics (5th Edition)",
+      "authors": "Vanessa Shaw (Editor)",
+      "year": "2020",
+      "publisher": "Wiley-Blackwell",
+      "description": "Produced with the BDA Paediatric Specialist Group. Covers inherited metabolic disorders, organ-system diseases, ketogenic diet, diabetes technology, refeeding syndrome and blended enteral diets.",
+      "link": "https://books.google.co.uk/books?q=isbn:9781119467298"
+    },
+    {
+      "id": "book-oxford-handbook-3",
+      "title": "Oxford Handbook of Nutrition and Dietetics (3rd Edition)",
+      "authors": "Joan Webster-Gandy, Angela Madden, Michelle Holdsworth",
+      "year": "2020",
+      "publisher": "Oxford University Press",
+      "description": "Pocket reference for practising dietitians and students covering clinical nutrition, nutritional support and public health nutrition.",
+      "link": "https://books.google.co.uk/books?q=isbn:9780198800132"
+    },
+    {
+      "id": "book-advanced-obesity",
+      "title": "Advanced Nutrition and Dietetics in Obesity",
+      "authors": "Catherine Hankey (Editor); Kevin Whelan (Series Editor)",
+      "year": "2018",
+      "publisher": "Wiley-Blackwell (BDA Advanced Nutrition and Dietetics series)",
+      "description": "Evidence-based review of obesity aetiology, assessment and dietary, behavioural, pharmacological and surgical management.",
+      "link": "https://books.google.co.uk/books?q=isbn:9780470670767"
+    }
+  ]
+}
